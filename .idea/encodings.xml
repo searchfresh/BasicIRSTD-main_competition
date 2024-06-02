@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/log/allThreshold_SIRST3_ACM_2023-11-11_12_32_58.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/log/allThreshold_SIRST3_ACM_2023-11-13_12_55_29.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/log/allThreshold_SIRST3_ALCNet_2023-11-11_11_32_23.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/log/allThreshold_SIRST3_ALCNet_2023-11-13_14_14_44.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/log/allThreshold_SIRST3_DNANet_2023-11-13_13_58_47.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/log/allThreshold_SIRST3_ISNet_2023-11-11_12_21_03.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/log/allThreshold_SIRST3_ISNet_2023-11-13_14_19_20.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/log/allThreshold_SIRST3_RepirDet_2023-11-11_11_24_25.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/log/allThreshold_SIRST3_RepirDet_2023-11-13_13_39_13.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/log/allThreshold_SIRST3_UIUNet_2023-11-11_12_07_36.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/log/allThreshold_SIRST3_UIUNet_2023-11-13_14_27_22.txt" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/model/ISTDUNet/resnet2020.py" charset="GBK" />
+  </component>
+</project>
