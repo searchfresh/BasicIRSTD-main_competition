@@ -80,7 +80,7 @@ def test():
 
 
 if __name__ == '__main__':
-    opt.f = open(opt.save_log + 'test_' + (time.ctime()).replace(' ', '_').replace(':', '_') + '.txt', 'w')
+    opt.f = open(opt.save_log + 'test' + '.txt', 'w')
     if opt.pth_dirs == None:
         for i in range(len(opt.model_names)):
             opt.model_name = opt.model_names[i]
