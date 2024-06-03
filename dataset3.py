@@ -45,30 +45,30 @@ class TestSetLoader(Dataset):
         # img = Image.open((self.dataset_dir + '/images/' + self.test_list[idx] + img_ext).replace('//', '/')).convert('I')
         img = Image.open((self.dataset_dir + '/images/' + self.test_list[idx] + img_ext).replace('//', '/')).convert('I')
         # mask = Image.open((self.dataset_dir + '/masks/' + self.train_list[idx] + img_ext).replace('//','/'))
-        mask = Image.open((self.dataset_dir + '/masks/' + self.test_list[idx] + img_ext).replace('//', '/')).convert('I')
+        # mask = Image.open((self.dataset_dir + '/masks/' + self.test_list[idx] + img_ext).replace('//', '/')).convert('I')
 
         # img = Normalized(np.array(img, dtype=np.float32), self.img_norm_cfg)
         img = Normalized(np.array(img, dtype=np.float32), None)
-        mask = np.array(mask, dtype=np.float32) / 255.0
-        if len(mask.shape) > 3:
-            mask = mask[:, :, 0]
+        # mask = np.array(mask, dtype=np.float32) / 255.0
+        # if len(mask.shape) > 3:
+        #     mask = mask[:, :, 0]
 
         ori_h , ori_w = img.shape
 
         img = PadImg(img, 32)
-        mask = PadImg(mask, 32)
+        # mask = PadImg(mask, 32)
 
         # transform TTA
-        if self.transform is not None:
-            transformed = self.transform(image=img, mask=mask)
-            img = transformed["image"]
-            mask = transformed["mask"]
+        # if self.transform is not None:
+        #     transformed = self.transform(image=img, mask=mask)
+        #     img = transformed["image"]
+        #     mask = transformed["mask"]
         h, w = img.shape
-        img, mask = img[np.newaxis, :], mask[np.newaxis, :]
+        img = img[np.newaxis, :]
 
         img = torch.from_numpy(np.ascontiguousarray(img))
-        mask = torch.from_numpy(np.ascontiguousarray(mask))
-        return img, mask, [h, w], self.test_list[idx], [ori_h , ori_w]
+        # mask = torch.from_numpy(np.ascontiguousarray(mask))
+        return img, None, [h, w], self.test_list[idx], [ori_h , ori_w]
 
     def __len__(self):
         return len(self.test_list)

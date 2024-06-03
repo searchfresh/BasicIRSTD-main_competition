@@ -50,9 +50,9 @@ def test():
         net.load_state_dict(torch.load(opt.pth_dir, map_location=device)['state_dict'])
     net.eval()
 
-    eval_mIoU = mIoU()
-    eval_PD_FA = PD_FA()
-    for idx_iter, (img, gt_mask, size, img_dir, ori_size) in enumerate(test_loader):
+    # eval_mIoU = mIoU()
+    # eval_PD_FA = PD_FA()
+    for idx_iter, (img, _, size, img_dir, ori_size) in enumerate(test_loader):
         img = Variable(img).cuda()
         pred = net.forward(img)
         if isinstance(pred, list):
@@ -60,9 +60,9 @@ def test():
         elif isinstance(pred, tuple):
             pred = pred[0]
         pred = pred[:, :, :ori_size[0], :ori_size[1]]
-        gt_mask = gt_mask[:, :, :ori_size[0], :ori_size[1]]
-        eval_mIoU.update((pred > opt.threshold).cpu(), gt_mask)
-        eval_PD_FA.update((pred[0, 0, :, :] > opt.threshold).cpu(), gt_mask[0, 0, :, :], ori_size)
+        # gt_mask = gt_mask[:, :, :ori_size[0], :ori_size[1]]
+        # eval_mIoU.update((pred > opt.threshold).cpu(), gt_mask)
+        # eval_PD_FA.update((pred[0, 0, :, :] > opt.threshold).cpu(), gt_mask[0, 0, :, :], ori_size)
 
         ### save img
         if opt.save_img == True:
@@ -71,12 +71,12 @@ def test():
                 os.makedirs(opt.save_img_dir + opt.test_dataset_name + '/' + opt.model_name)
             img_save.save(opt.save_img_dir + opt.test_dataset_name + '/' + opt.model_name + '/' + img_dir[0] + '.png')
 
-    results1 = eval_mIoU.get()
-    results2 = eval_PD_FA.get()
-    print("pixAcc, mIoU:\t" + str(results1))
-    print("PD, FA:\t" + str(results2))
-    opt.f.write("pixAcc, mIoU:\t" + str(results1) + '\n')
-    opt.f.write("PD, FA:\t" + str(results2) + '\n')
+    # results1 = eval_mIoU.get()
+    # results2 = eval_PD_FA.get()
+    # print("pixAcc, mIoU:\t" + str(results1))
+    # print("PD, FA:\t" + str(results2))
+    # opt.f.write("pixAcc, mIoU:\t" + str(results1) + '\n')
+    # opt.f.write("PD, FA:\t" + str(results2) + '\n')
 
 
 if __name__ == '__main__':
