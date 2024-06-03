@@ -39,8 +39,8 @@ if opt.img_norm_cfg_mean != None and opt.img_norm_cfg_std != None:
 
 
 def test():
-    test_set = TestSetLoader(opt.dataset_dir, opt.train_dataset_name, opt.test_dataset_name, None)
-    test_loader = DataLoader(dataset=test_set, num_workers=1, batch_size=1, shuffle=False)
+    test_set = TestSetLoader(opt.dataset_dir, opt.dataset_name, opt.dataset_name, None)
+    test_loader = DataLoader(dataset=test_set, num_workers=1, batch_size=2, shuffle=False)
 
     net = Net(model_name=opt.model_name, mode='test').cuda()
     try:
@@ -67,9 +67,9 @@ def test():
         ### save img
         if opt.save_img == True:
             img_save = transforms.ToPILImage()((pred[0, 0, :, :]).cpu())
-            if not os.path.exists(opt.save_img_dir + opt.test_dataset_name + '/' + opt.model_name):
-                os.makedirs(opt.save_img_dir + opt.test_dataset_name + '/' + opt.model_name)
-            img_save.save(opt.save_img_dir + opt.test_dataset_name + '/' + opt.model_name + '/' + img_dir[0] + '.png')
+            if not os.path.exists(opt.save_img_dir + opt.dataset_name + '/' + opt.model_name):
+                os.makedirs(opt.save_img_dir + opt.dataset_name + '/' + opt.model_name)
+            img_save.save(opt.save_img_dir + opt.dataset_name + '/' + opt.model_name + '/' + img_dir[0] + '.png')
 
     # results1 = eval_mIoU.get()
     # results2 = eval_PD_FA.get()
