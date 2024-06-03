@@ -101,7 +101,7 @@ if __name__ == '__main__':
         for model_name in opt.model_names:
             for dataset_name in opt.dataset_names:
                 for pth_dir in opt.pth_dirs:
-                    opt.test_data4set_name = dataset_name
+                    opt.test_dataset_name = dataset_name
                     opt.model_name = model_name
                     opt.train_dataset_name = pth_dir.split('/')[0]
                     print(pth_dir)
