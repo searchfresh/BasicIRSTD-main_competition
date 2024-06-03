@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from metrics import *
 import os
 import time
+import torch.nn.functional as F
 
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 parser = argparse.ArgumentParser(description="PyTorch BasicIRSTD test")
@@ -54,11 +55,16 @@ def test():
     # eval_PD_FA = PD_FA()
     for idx_iter, (img, _, size, img_dir, ori_size) in enumerate(test_loader):
         img = Variable(img).cuda()
+        if size[0]>=2048 or size[1]>=2048:
+            img = F.interpolate(input=img, scale_factor=0.25, mode='bilinear',)
         pred = net.forward(img)
+
         if isinstance(pred, list):
             pred = pred[0]
         elif isinstance(pred, tuple):
             pred = pred[0]
+        if size[0] >= 2048 or size[1] >= 2048:
+            pred = F.interpolate(input=pred, size=(size[0], size[1]), mode='bilinear',)
         pred = pred[:, :, :ori_size[0], :ori_size[1]]
         # gt_mask = gt_mask[:, :, :ori_size[0], :ori_size[1]]
         # eval_mIoU.update((pred > opt.threshold).cpu(), gt_mask)
