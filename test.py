@@ -55,8 +55,11 @@ def test():
     # eval_PD_FA = PD_FA()
     for idx_iter, (img, _, size, img_dir, ori_size) in enumerate(test_loader):
         img = Variable(img).cuda()
-        if size[0]>=2048 or size[1]>=2048:
+        if size[0]>=4096 or size[1]>=4096:
+            img = F.interpolate(input=img, size=(1024, 1024), mode='bilinear', )
+        elif size[0]>=2048 or size[1]>=2048:
             img = F.interpolate(input=img, scale_factor=0.25, mode='bilinear',)
+
         pred = net.forward(img)
 
         if isinstance(pred, list):
