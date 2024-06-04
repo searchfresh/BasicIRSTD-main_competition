@@ -40,7 +40,7 @@ if opt.img_norm_cfg_mean != None and opt.img_norm_cfg_std != None:
 
 def test():
     test_set = TestSetLoader(opt.dataset_dir, opt.dataset_names, opt.dataset_names, None)
-    test_loader = DataLoader(dataset=test_set, num_workers=2, batch_size=1, shuffle=False)
+    test_loader = DataLoader(dataset=test_set, num_workers=0, batch_size=1, shuffle=False)
 
     net = Net(model_name=opt.model_names, mode='test').cuda()
     try:
