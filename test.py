@@ -12,13 +12,14 @@ import torch
 
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 parser = argparse.ArgumentParser(description="PyTorch BasicIRSTD test")
-parser.add_argument("--model_names", default=['LKUNet'], nargs='+',
+parser.add_argument("--model_names", default='LKUNet',
                     help="model_name: 'ACM', 'ALCNet', 'DNANet', 'ISNet', 'UIUNet', 'RDIAN', 'ISTDU-Net', 'U-Net', 'RISTDnet'")
-parser.add_argument("--pth_dirs", default=['./checkpoint/Dataset-mask/LKUNet_15.pth'], nargs='+',
-                    help="checkpoint dir, default=None or ['NUDT-SIRST/ACM_400.pth.tar','NUAA-SIRST/ACM_400.pth.tar']")
-parser.add_argument("--dataset_dir", default='D:\PycharmFile\BasicIRSTD-main\datasets', type=str, help="train_dataset_dir")
-parser.add_argument("--dataset_names", default=['Dataset-mask'], nargs='+',
-                    help="dataset_name: 'NUAA-SIRST', 'NUDT-SIRST', 'IRSTD-1K', 'SIRST3', 'NUDT-SIRST-Sea'")
+parser.add_argument("--pth_dirs", default=None,
+                    help="checkpoint dir" )
+parser.add_argument("--dataset_dir", default='./datasets', type=str, help="train_dataset_dir")
+
+parser.add_argument("--dataset_names", default='WideIRSTD', type=str,
+                    help="dataset_name: Dataset-mask 'NUAA-SIRST', 'NUDT-SIRST', 'IRSTD-1K', 'SIRST3', 'NUST'")
 parser.add_argument("--img_norm_cfg", default=None, type=dict,
                     help="specific a img_norm_cfg, default=None (using img_norm_cfg values of each dataset)")
 parser.add_argument("--img_norm_cfg_mean", default=None, type=float,
@@ -41,7 +42,7 @@ if opt.img_norm_cfg_mean != None and opt.img_norm_cfg_std != None:
 
 
 def test():
-    test_set = TestSetLoader(opt.dataset_dir, opt.dataset_name, opt.dataset_name, None)
+    test_set = TestSetLoader(opt.dataset_dir, opt.test_dataset_name, opt.test_dataset_name, None)
     test_loader = DataLoader(dataset=test_set, num_workers=2, batch_size=1, shuffle=False)
 
     net = Net(model_name=opt.model_name, mode='test').cuda()
@@ -54,7 +55,7 @@ def test():
 
     # eval_mIoU = mIoU()
     # eval_PD_FA = PD_FA()
-    for idx_iter, (img, _, size, img_dir, ori_size) in enumerate(test_loader):
+    for idx_iter, (img, mask, size, img_dir, ori_size) in enumerate(test_loader):
         img = Variable(img).cuda()
         if size[0]>=4096 or size[1]>=4096:
             img = F.interpolate(input=img, size=(1024, 1024), mode='bilinear', )
@@ -77,9 +78,11 @@ def test():
         ### save img
         if opt.save_img == True:
             img_save = transforms.ToPILImage()((pred[0, 0, :, :]).cpu())
-            if not os.path.exists(opt.save_img_dir + opt.dataset_name + '/' + opt.model_name):
-                os.makedirs(opt.save_img_dir + opt.dataset_name + '/' + opt.model_name)
-            img_save.save(opt.save_img_dir + opt.dataset_name + '/' + opt.model_name + '/' + img_dir[0] + '.png')
+            if not os.path.exists(opt.save_img_dir + opt.test_dataset_name + '/' + opt.model_name):
+                os.makedirs(opt.save_img_dir + opt.test_dataset_name + '/' + opt.model_name)
+            # a = opt.save_img_dir + opt.dataset_name + '/' + opt.model_name + '/' + img_dir[0] + '.png'
+            img_save.save(opt.save_img_dir + opt.test_dataset_name + '/' + opt.model_name + '/' + img_dir[0] + '.png')
+
 
     # results1 = eval_mIoU.get()
     # results2 = eval_PD_FA.get()
@@ -92,35 +95,18 @@ def test():
 if __name__ == '__main__':
     opt.f = open(opt.save_log + 'test' + '.txt', 'w')
     if opt.pth_dirs == None:
-        for i in range(len(opt.model_names)):
-            opt.model_name = opt.model_names[i]
-            print(opt.model_name)
-            opt.f.write(opt.model_name + '_400.pth.tar' + '\n')
-            for dataset_name in opt.dataset_names:
-                opt.dataset_name = dataset_name
-                opt.train_dataset_name = opt.dataset_name
-                opt.test_dataset_name = opt.dataset_name
-                print(dataset_name)
-                opt.f.write(opt.dataset_name + '\n')
-                opt.pth_dir = opt.save_log + opt.dataset_name + '/' + opt.model_name + '_400.pth.tar'
-                test()
-            print('\n')
-            opt.f.write('\n')
-        opt.f.close()
+        raise RuntimeError
     else:
-        for model_name in opt.model_names:
-            for dataset_name in opt.dataset_names:
-                for pth_dir in opt.pth_dirs:
-                    opt.test_dataset_name = dataset_name
-                    opt.model_name = model_name
-                    opt.train_dataset_name = pth_dir.split('/')[0]
-                    print(pth_dir)
-                    opt.f.write(pth_dir)
-                    print(opt.test_dataset_name)
-                    opt.f.write(opt.test_dataset_name + '\n')
-                    # opt.pth_dir = opt.save_log + pth_dir
-                    opt.pth_dir = pth_dir
-                    test()
-                    print('\n')
-                    opt.f.write('\n')
+        opt.test_dataset_name = opt.dataset_names
+        opt.model_name = opt.model_names
+        # opt.train_dataset_name = pth_dir.split('/')[0]
+        print(opt.pth_dirs)
+        opt.f.write(opt.pth_dirs)
+        print(opt.test_dataset_name)
+        opt.f.write(opt.test_dataset_name + '\n')
+        # opt.pth_dir = opt.save_log + pth_dir
+        opt.pth_dir = opt.pth_dirs
+        test()
+        print('\n')
+        opt.f.write('\n')
         opt.f.close()
