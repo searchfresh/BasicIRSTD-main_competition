@@ -50,7 +50,7 @@ def test():
         net.load_state_dict(torch.load(opt.pth_dirs, map_location=device)['state_dict'])
     net.eval()
     with torch.no_grad():
-        for idx_iter, (img, mask, size, img_dir, ori_size) in enumerate(test_loader):
+        for idx_iter, (img,  size, img_dir, ori_size) in enumerate(test_loader):
             img = Variable(img).cuda()
             if size[0]>=4096 or size[1]>=4096:
                 img = F.interpolate(input=img, size=(1024, 1024), mode='bilinear', )

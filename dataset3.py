@@ -68,7 +68,7 @@ class TestSetLoader(Dataset):
 
         img = torch.from_numpy(np.ascontiguousarray(img))
         # mask = torch.from_numpy(np.ascontiguousarray(mask))
-        return img, None, [h, w], self.test_list[idx], [ori_h , ori_w]
+        return img, [h, w], self.test_list[idx], [ori_h , ori_w]
 
     def __len__(self):
         return len(self.test_list)
