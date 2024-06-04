@@ -49,29 +49,30 @@ def test():
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         net.load_state_dict(torch.load(opt.pth_dirs, map_location=device)['state_dict'])
     net.eval()
-    for idx_iter, (img, mask, size, img_dir, ori_size) in enumerate(test_loader):
-        img = Variable(img).cuda()
-        if size[0]>=4096 or size[1]>=4096:
-            img = F.interpolate(input=img, size=(1024, 1024), mode='bilinear', )
-        elif size[0]>=2048 or size[1]>=2048:
-            img = F.interpolate(input=img, scale_factor=0.25, mode='bilinear',)
+    with torch.no_grad():
+        for idx_iter, (img, mask, size, img_dir, ori_size) in enumerate(test_loader):
+            img = Variable(img).cuda()
+            if size[0]>=4096 or size[1]>=4096:
+                img = F.interpolate(input=img, size=(1024, 1024), mode='bilinear', )
+            elif size[0]>=2048 or size[1]>=2048:
+                img = F.interpolate(input=img, scale_factor=0.25, mode='bilinear',)
 
-        pred = net.forward(img)
+            pred = net.forward(img)
 
-        if isinstance(pred, list):
-            pred = pred[0]
-        elif isinstance(pred, tuple):
-            pred = pred[0]
-        if size[0] >= 2048 or size[1] >= 2048:
-            pred = F.interpolate(input=pred, size=(size[0], size[1]), mode='bilinear',)
-        pred = pred[:, :, :ori_size[0], :ori_size[1]]
+            if isinstance(pred, list):
+                pred = pred[0]
+            elif isinstance(pred, tuple):
+                pred = pred[0]
+            if size[0] >= 2048 or size[1] >= 2048:
+                pred = F.interpolate(input=pred, size=(size[0], size[1]), mode='bilinear',)
+            pred = pred[:, :, :ori_size[0], :ori_size[1]]
 
-        ### save img
-        if opt.save_img == True:
-            img_save = transforms.ToPILImage()((pred[0, 0, :, :]).cpu())
-            if not os.path.exists(opt.save_img_dir + opt.dataset_names + '/' + opt.model_names):
-                os.makedirs(opt.save_img_dir + opt.dataset_names + '/' + opt.model_names)
-            img_save.save(opt.save_img_dir + opt.dataset_names + '/' + opt.model_names + '/' + img_dir[0] + '.png')
+            ### save img
+            if opt.save_img == True:
+                img_save = transforms.ToPILImage()(((pred[0,0,:,:]>opt.threshold).float()).cpu())
+                if not os.path.exists(opt.save_img_dir + opt.dataset_names + '/' + opt.model_names):
+                    os.makedirs(opt.save_img_dir + opt.dataset_names + '/' + opt.model_names)
+                img_save.save(opt.save_img_dir + opt.dataset_names + '/' + opt.model_names + '/' + img_dir[0] + '.png')
 
 
 if __name__ == '__main__':
