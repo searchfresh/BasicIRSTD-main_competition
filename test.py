@@ -8,6 +8,7 @@ from metrics import *
 import os
 import time
 import torch.nn.functional as F
+import torch
 
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 parser = argparse.ArgumentParser(description="PyTorch BasicIRSTD test")
@@ -41,7 +42,7 @@ if opt.img_norm_cfg_mean != None and opt.img_norm_cfg_std != None:
 
 def test():
     test_set = TestSetLoader(opt.dataset_dir, opt.dataset_name, opt.dataset_name, None)
-    test_loader = DataLoader(dataset=test_set, num_workers=1, batch_size=2, shuffle=False)
+    test_loader = DataLoader(dataset=test_set, num_workers=2, batch_size=1, shuffle=False)
 
     net = Net(model_name=opt.model_name, mode='test').cuda()
     try:
