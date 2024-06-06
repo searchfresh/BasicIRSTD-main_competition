@@ -52,8 +52,8 @@ def test():
     with torch.no_grad():
         for idx_iter, (img,  size, img_dir, ori_size) in enumerate(test_loader):
             img = Variable(img).cuda()
-            if size[0]>=4096 or size[1]>=4096:
-                img = F.interpolate(input=img, size=(size[0]//4, size[0]//4), mode='bilinear', )
+            # if size[0]>=4096 or size[1]>=4096:
+            #     img = F.interpolate(input=img, size=(size[0]//4, size[0]//4), mode='bilinear', )
             # elif size[0]>=2048 or size[1]>=2048:
             #     img = F.interpolate(input=img, scale_factor=0.25, mode='bilinear',)
 
@@ -63,8 +63,8 @@ def test():
                 pred = pred[0]
             elif isinstance(pred, tuple):
                 pred = pred[0]
-            if size[0] >= 4096 or size[1] >= 4096:
-                pred = F.interpolate(input=pred, size=(size[0], size[1]), mode='bilinear',)
+            # if size[0] >= 4096 or size[1] >= 4096:
+            #     pred = F.interpolate(input=pred, size=(size[0], size[1]), mode='bilinear',)
             pred = pred[:, :, :ori_size[0], :ori_size[1]]
 
             ### save img
