@@ -6,7 +6,7 @@ from dataset3 import *
 import os
 import torch.nn.functional as F
 import torch
-
+from torch.optim.swa_utils import AveragedModel
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 parser = argparse.ArgumentParser(description="PyTorch BasicIRSTD test")
 parser.add_argument("--model_names", default='LKUNet',
@@ -28,6 +28,8 @@ parser.add_argument("--save_img", default=True, type=bool, help="save image of o
 parser.add_argument("--save_img_dir", type=str, default='./results/', help="path of saved image")
 parser.add_argument("--save_log", type=str, default='./log/', help="path of saved .pth")
 parser.add_argument("--threshold", type=float, default=0.5)
+parser.add_argument("--SWA", type=bool, default=True, help="Sliced for inference")
+parser.add_argument("--filter_large", type=bool, default=True, help="Sliced for inference")
 
 global opt
 opt = parser.parse_args()
@@ -43,8 +45,11 @@ def test():
     test_loader = DataLoader(dataset=test_set, num_workers=0, batch_size=1, shuffle=False)
 
     net = Net(model_name=opt.model_names, mode='test').cuda()
+    if opt.SWA == True:
+        net = AveragedModel(net)
+
     try:
-        net.load_state_dict(torch.load(opt.pth_dirs)['state_dict'])
+        net.load_state_dict(torch.load(opt.pth_dirs)['state_dict'], strict=True)
     except:
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         net.load_state_dict(torch.load(opt.pth_dirs, map_location=device)['state_dict'])
@@ -65,6 +70,14 @@ def test():
                 pred = pred[0]
             # if size[0] >= 4096 or size[1] >= 4096:
             #     pred = F.interpolate(input=pred, size=(size[0], size[1]), mode='bilinear',)
+            if opt.filter_large:
+                if pred.shape[-1] >= 2048 or pred.shape[-2] >= 2048:
+                    predits = np.array((pred[0, 0, :, :] > opt.threshold).cpu()).astype('int64')
+                    image_predict = measure.label(predits, connectivity=2)
+                    coord_image = measure.regionprops(image_predict)
+                    if len(coord_image) > 10:
+                        pred = torch.zeros_like(pred)
+
             pred = pred[:, :, :ori_size[0], :ori_size[1]]
 
             ### save img
