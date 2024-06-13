@@ -130,12 +130,12 @@ def test():
             # pred = ((pred1+pred2+pred3 - torch.ones_like(pred1))>0).float()
 
 
-            ### save img
+            ### save img LKUNet
             if opt.save_img == True:
                 img_save = transforms.ToPILImage()(((pred[0, 0,:,:]>opt.threshold).float()).cpu())
-                if not os.path.exists(opt.save_img_dir + opt.dataset_names + '/' + "LKUNet"):
-                    os.makedirs(opt.save_img_dir + opt.dataset_names + '/' + "LKUNet")
-                img_save.save(opt.save_img_dir + opt.dataset_names + '/' + "LKUNet" + '/' + img_dir[0] + '.png')
+                if not os.path.exists(opt.save_img_dir + opt.dataset_names + '/' + opt.model_names_1):
+                    os.makedirs(opt.save_img_dir + opt.dataset_names + '/' + opt.model_names_1)
+                img_save.save(opt.save_img_dir + opt.dataset_names + '/' + opt.model_names_1 + '/' + img_dir[0] + '.png')
 
 
 if __name__ == '__main__':
