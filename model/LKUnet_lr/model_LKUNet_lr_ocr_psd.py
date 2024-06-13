@@ -289,6 +289,7 @@ class LKUNet(nn.Module):
             nn.ReLU(),
             nn.Upsample(scale_factor=2, mode='bilinear'),
         )
+
         self.last2x = nn.Sequential(
 
             nn.Conv2d(
@@ -333,7 +334,6 @@ class LKUNet(nn.Module):
 
     def forward(self, input):
 
-
         layers = self.backbone(input)
 
         feats4x = layers[0]
@@ -353,8 +353,8 @@ class LKUNet(nn.Module):
         # out = torch.concat([out, self.shut2x(feats2x)], dim=1)
         # B, C, H, W = feats_ocr.shape
         # out = feats_ocr.reshape([B, C, -1]).softmax(dim=-1).reshape(B, C, H, W) * feats_ocr
-
-        out = self.last2x(self.last(out))
+        out=self.last(out)
+        out = self.last2x(out)
         return [out.sigmoid(),F.interpolate(out_aux,scale_factor=2,mode='bilinear').sigmoid()]
 
     def pixel_shuffle_down(self,x):

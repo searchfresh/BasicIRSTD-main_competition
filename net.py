@@ -71,12 +71,20 @@ class Net(nn.Module):
                 self.model = RepISD()
             else:
                 self.model = RepISD(deploy=True,convert=True)
+
+            # only finetune
+            # self.cal_loss = FIoULoss(
+
         elif model_name == "LKUNet":
             self.model = LKUNet()
+
+        elif model_name == "LKUNet2":
+            self.model = LKUNet2()
+
+        elif model_name == "LKUNet3":
+            self.model = LKUNet3()
             # only finetune
-            # self.cal_loss = FIoULoss()
-        elif model_name == "HrisNet":
-            self.model = HrisNet()
+            # self.cal_loss = LKULoss()
 
     def forward(self, img):
         return self.model(img)
