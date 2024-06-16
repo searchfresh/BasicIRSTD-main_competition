@@ -107,9 +107,9 @@ def test():
 
                     img = F.interpolate(input=img, size=size_t, mode='bilinear', )
 
-                    pred1 = net1.forward(img)
-                    pred1 = F.interpolate(input=pred1, size=(size[0],size[1]),
-                                        mode='bilinear', )
+                    # pred1 = net1.forward(img)
+                    # pred1 = F.interpolate(input=pred1, size=(size[0],size[1]),
+                    #                     mode='bilinear', )
                     pred2 = net2.forward(img)
                     pred2 = F.interpolate(input=pred2, size=(size[0], size[1]),
                                           mode='bilinear', )
@@ -122,8 +122,10 @@ def test():
                     #                       mode='bilinear', )
                     # pred3 = torch.zeros_like(img)
                     pred4 = torch.zeros_like(pred3)
+                    pred1 = torch.zeros_like(pred4)
                 else:
-                    pred1 = net1.forward(img)
+                    # pred1 = net1.forward(img)
+                    pred1 = torch.zeros_like(img)
                     pred2 = net2.forward(img)
                     pred3 = net3.forward(img)
                     pred4 = slice_inference(img, size, 512, net4)
