@@ -112,7 +112,7 @@ def test():
                                           mode='bilinear', )
                     # pred4 = net4.forward(img)
                     pred4 = slice_inference(img, size, 256, net4)
-                    pred4 = F.interpolate(input=pred4[0], scale_factor=(size[0], size[1]),
+                    pred4 = F.interpolate(input=pred4, scale_factor=(size[0], size[1]),
                                           mode='bilinear', )
                 else:
                     pred1 = net1.forward(img)
