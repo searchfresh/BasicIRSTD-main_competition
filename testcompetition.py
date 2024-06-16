@@ -101,9 +101,9 @@ def test():
                     # if len(coord_image) > 10:
                     #     pred = torch.zeros_like(pred)
                     if size[0] > size[1]:
-                        size_t = (1024, ((1024 * size[1] // size[0]) // 2) * 2)
+                        size_t = (1024, int(((1024 * size[1] // size[0]) // 2) * 2))
                     else:
-                        size_t = (((1024 * size[1] // size[0]) // 2) * 2, 1024)
+                        size_t = ((int((1024 * size[0] // size[1]) // 2) * 2), 1024)
 
                     img = F.interpolate(input=img, size=size_t, mode='bilinear', )
 
@@ -113,24 +113,24 @@ def test():
                     pred2 = net2.forward(img)
                     pred2 = F.interpolate(input=pred2, size=(size[0], size[1]),
                                           mode='bilinear', )
-                    pred3 = slice_inference(img, size_t, 512, net3)
+                    pred3 = net3.forward(img)
                     pred3 = F.interpolate(input=pred3, size=(size[0], size[1]),
                                           mode='bilinear', )
 
-                    pred4 = slice_inference(img, size_t, 512, net4)
-                    pred4 = F.interpolate(input=pred4, size=(size[0], size[1]),
-                                          mode='bilinear', )
+                    # pred4 = slice_inference(img, size_t, 512, net4)
+                    # pred4 = F.interpolate(input=pred4, size=(size[0], size[1]),
+                    #                       mode='bilinear', )
                     # pred3 = torch.zeros_like(img)
-                    # pred4 = torch.zeros_like(img)
+                    pred4 = torch.zeros_like(pred3)
                 else:
                     pred1 = net1.forward(img)
                     pred2 = net2.forward(img)
-                    pred3 = slice_inference(img, size, 512, net3)
+                    pred3 = net3.forward(img)
                     pred4 = slice_inference(img, size, 512, net4)
             else:
                 pred1 = net1.forward(img)
                 pred2 = net2.forward(img)
-                pred3 = slice_inference(img, size, 512, net3)
+                pred3 = net3.forward(img)
                 pred4 = slice_inference(img, size, 512, net4)
 
 
