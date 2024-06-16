@@ -414,8 +414,10 @@ blocks_dict = {
 }
 
 import yaml
-
-filename = r'D:\PycharmFile\BasicIRSTD-main\model\HrisNet\config.yaml'
+import os
+# current_dir = os.path.dirname(__file__)
+# filename = r'D:\PycharmFile\BasicIRSTD-main\model\HrisNet\config.yaml'
+filename = os.path.join(os.path.dirname(__file__),'config.yaml')
 with open(filename, "r", encoding="utf-8") as yaml_file:
     config = yaml.safe_load(yaml_file)
 
