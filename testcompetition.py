@@ -99,7 +99,7 @@ def test():
                     # coord_image = measure.regionprops(image_predict)
                     # if len(coord_image) > 10:
                     #     pred = torch.zeros_like(pred)
-                    img = F.interpolate(input=img, scale_factor=(1024,((1024*size[1]//size[0])//2)*2), mode='bilinear', )
+                    img = F.interpolate(input=img, scale_factor=(720,((720*size[1]//size[0])//2)*2), mode='bilinear', )
                     pred1 = net1.forward(img)
                     pred1 = F.interpolate(input=pred1, scale_factor=(size[0],size[1]),
                                         mode='bilinear', )
