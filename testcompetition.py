@@ -100,7 +100,7 @@ def test():
                     # coord_image = measure.regionprops(image_predict)
                     # if len(coord_image) > 10:
                     #     pred = torch.zeros_like(pred)
-                    img = F.interpolate(input=img, size=(1024,((1024*size[1]//size[0])//2)*2), mode='bilinear', )
+                    img = F.interpolate(input=img, size=(1024,1024), mode='bilinear', )
                     pred1 = net1.forward(img)
                     pred1 = F.interpolate(input=pred1, size=(size[0],size[1]),
                                         mode='bilinear', )
@@ -108,7 +108,7 @@ def test():
                     pred2 = F.interpolate(input=pred2, size=(size[0], size[1]),
                                           mode='bilinear', )
                     pred3 = net3.forward(img)
-                    pred3 = F.interpolate(input=pred3, size=(size[0], size[1]),
+                    pred3 = F.interpolate(input=pred3[0], size=(size[0], size[1]),
                                           mode='bilinear', )
                     # pred4 = net4.forward(img)
                     pred4 = slice_inference(img, size, 256, net4)
