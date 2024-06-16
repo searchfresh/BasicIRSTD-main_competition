@@ -27,7 +27,7 @@ def infer_patch(model, patch):
             elif isinstance(pred2, tuple):
                 pred2 = pred2[0]
             pred = torch.cat([pred1, pred2], dim=0)
-        elif b > 16:
+        elif b > 16 and b <= 36:
             pred1 = model.forward(patch[0: b // 4, :, :, :])
             if isinstance(pred1, list):
                 pred1 = pred1[0]
@@ -49,13 +49,54 @@ def infer_patch(model, patch):
             elif isinstance(pred4, tuple):
                 pred4 = pred4[0]
             pred = torch.cat([pred1, pred2, pred3, pred4], dim=0)
+        elif b > 36:
+            pred1 = model.forward(patch[0: b // 4, :, :, :])
+            if isinstance(pred1, list):
+                pred1 = pred1[0]
+            elif isinstance(pred1, tuple):
+                pred1 = pred1[0]
+            pred2 = model.forward(patch[b // 4:b // 2, :, :, :])
+            if isinstance(pred2, list):
+                pred2 = pred2[0]
+            elif isinstance(pred2, tuple):
+                pred2 = pred2[0]
+            pred3 = model.forward(patch[b // 2:(b // 4) * 3, :, :, :])
+            if isinstance(pred3, list):
+                pred3 = pred3[0]
+            elif isinstance(pred3, tuple):
+                pred3 = pred3[0]
+            pred4 = model.forward(patch[(b // 4) * 3:, :, :, :])
+            if isinstance(pred4, list):
+                pred4 = pred4[0]
+            elif isinstance(pred4, tuple):
+                pred4 = pred4[0]
+            pred5 = model.forward(patch[(b // 4) * 3:, :, :, :])
+            if isinstance(pred5, list):
+                pred5 = pred5[0]
+            elif isinstance(pred5, tuple):
+                pred5 = pred5[0]
+            pred6 = model.forward(patch[(b // 4) * 3:, :, :, :])
+            if isinstance(pred6, list):
+                pred6 = pred6[0]
+            elif isinstance(pred6, tuple):
+                pred6 = pred6[0]
+            pred7 = model.forward(patch[(b // 4) * 3:, :, :, :])
+            if isinstance(pred7, list):
+                pred7 = pred7[0]
+            elif isinstance(pred7, tuple):
+                pred7 = pred7[0]
+            pred8 = model.forward(patch[(b // 4) * 3:, :, :, :])
+            if isinstance(pred8, list):
+                pred8 = pred8[0]
+            elif isinstance(pred8, tuple):
+                pred8 = pred8[0]
+            pred = torch.cat([pred1, pred2, pred3, pred4, pred5, pred6, pred7, pred8], dim=0)
         else:
             pred = model.forward(patch)
             if isinstance(pred, list):
                 pred = pred[0]
             elif isinstance(pred, tuple):
                 pred = pred[0]
-
     return pred
 
 def pad_image(img, patch_size):  #已弃用，使用unfold代替
