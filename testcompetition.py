@@ -99,7 +99,7 @@ def test():
                     # coord_image = measure.regionprops(image_predict)
                     # if len(coord_image) > 10:
                     #     pred = torch.zeros_like(pred)
-                    img = F.interpolate(input=img, scale_factor=(1024,(1024*size[1]//size[0])//2*2), mode='bilinear', )
+                    img = F.interpolate(input=img, scale_factor=(1024,((1024*size[1]//size[0])//2)*2), mode='bilinear', )
                     pred1 = net1.forward(img)
                     pred1 = F.interpolate(input=pred1, scale_factor=(size[0],size[1]),
                                         mode='bilinear', )
@@ -110,7 +110,7 @@ def test():
                     pred3 = F.interpolate(input=pred3, scale_factor=(size[0], size[1]),
                                           mode='bilinear', )
                     pred4 = net4.forward(img)
-                    pred4[0] = F.interpolate(input=pred4[0], scale_factor=(size[0], size[1]),
+                    pred4 = F.interpolate(input=pred4[0], scale_factor=(size[0], size[1]),
                                           mode='bilinear', )
                 else:
                     pred1 = net1.forward(img)
@@ -158,7 +158,7 @@ def test():
 
             ### save img LKUNet
             if opt.save_img == True:
-                img_save = transforms.ToPILImage()((pred[0, 0,:,:]).cpu())
+                img_save = transforms.ToPILImage()(pred[0, 0,:,:].cpu())
                 if not os.path.exists(opt.save_img_dir + opt.dataset_names + '/' + opt.model_names_1):
                     os.makedirs(opt.save_img_dir + opt.dataset_names + '/' + opt.model_names_1)
                 img_save.save(opt.save_img_dir + opt.dataset_names + '/' + opt.model_names_1 + '/' + img_dir[0] + '.png')
