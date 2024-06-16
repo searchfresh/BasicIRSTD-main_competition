@@ -14,18 +14,47 @@ resize2 = transforms.Resize((256, 256), interpolation=transforms.InterpolationMo
 
 def infer_patch(model, patch):
     with torch.no_grad():
-        b,_,_,_ = patch.shape
-        pred1 = model.forward(patch[0 : b//2])
-        if isinstance(pred1, list):
-            pred1 = pred1[0]
-        elif isinstance(pred1, tuple):
-            pred1 = pred1[0]
-        pred2 = model.forward(patch[b // 2:])
-        if isinstance(pred2, list):
-            pred2 = pred2[0]
-        elif isinstance(pred2, tuple):
-            pred2 = pred2[0]
-        pred = torch.cat([pred1,pred2],dim=0)
+        b, _, _, _ = patch.shape
+        if b >= 2 and b <= 16:
+            pred1 = model.forward(patch[0: b // 2, :, :, :])
+            if isinstance(pred1, list):
+                pred1 = pred1[0]
+            elif isinstance(pred1, tuple):
+                pred1 = pred1[0]
+            pred2 = model.forward(patch[b // 2:, :, :, :])
+            if isinstance(pred2, list):
+                pred2 = pred2[0]
+            elif isinstance(pred2, tuple):
+                pred2 = pred2[0]
+            pred = torch.cat([pred1, pred2], dim=0)
+        elif b > 16:
+            pred1 = model.forward(patch[0: b // 4, :, :, :])
+            if isinstance(pred1, list):
+                pred1 = pred1[0]
+            elif isinstance(pred1, tuple):
+                pred1 = pred1[0]
+            pred2 = model.forward(patch[b // 4:b // 2, :, :, :])
+            if isinstance(pred2, list):
+                pred2 = pred2[0]
+            elif isinstance(pred2, tuple):
+                pred2 = pred2[0]
+            pred3 = model.forward(patch[b // 2:(b // 4) * 3, :, :, :])
+            if isinstance(pred3, list):
+                pred3 = pred3[0]
+            elif isinstance(pred3, tuple):
+                pred3 = pred3[0]
+            pred4 = model.forward(patch[(b // 4) * 3:, :, :, :])
+            if isinstance(pred4, list):
+                pred4 = pred4[0]
+            elif isinstance(pred4, tuple):
+                pred4 = pred4[0]
+            pred = torch.cat([pred1, pred2, pred3, pred4], dim=0)
+        else:
+            pred = model.forward(patch)
+            if isinstance(pred, list):
+                pred = pred[0]
+            elif isinstance(pred, tuple):
+                pred = pred[0]
 
     return pred
 
