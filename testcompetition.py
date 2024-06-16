@@ -60,27 +60,27 @@ def test():
     test_set = TestSetLoader(opt.dataset_dir, opt.dataset_names, opt.dataset_names, None)
     test_loader = DataLoader(dataset=test_set, num_workers=0, batch_size=1, shuffle=False)
 
-    net1 = Net(model_name=opt.model_names_1, mode='test').cuda()
+    # net1 = Net(model_name=opt.model_names_1, mode='test').cuda()
     net2 = Net(model_name=opt.model_names_2, mode='test').cuda()
     net3 = Net(model_name=opt.model_names_3, mode='test').cuda()
     net4 = Net(model_name=opt.model_names_4, mode='test').cuda()
     if opt.SWA == True:
-        net1 = AveragedModel(net1)
+        # net1 = AveragedModel(net1)
         net2 = AveragedModel(net2)
         # net3 = AveragedModel(net3)
 
     try:
-        net1.load_state_dict(torch.load(opt.pth_dirs_1)['state_dict'], strict=True)
+        # net1.load_state_dict(torch.load(opt.pth_dirs_1)['state_dict'], strict=True)
         net2.load_state_dict(torch.load(opt.pth_dirs_2)['state_dict'], strict=True)
         net3.load_state_dict(torch.load(opt.pth_dirs_3)['state_dict'], strict=True)
         net4.load_state_dict(torch.load(opt.pth_dirs_4)['state_dict'], strict=True)
     except:
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        net1.load_state_dict(torch.load(opt.pth_dirs_1, map_location=device)['state_dict'])
+        # net1.load_state_dict(torch.load(opt.pth_dirs_1, map_location=device)['state_dict'])
         net2.load_state_dict(torch.load(opt.pth_dirs_2, map_location=device)['state_dict'])
         net3.load_state_dict(torch.load(opt.pth_dirs_3, map_location=device)['state_dict'])
         net4.load_state_dict(torch.load(opt.pth_dirs_4, map_location=device)['state_dict'])
-    net1.eval()
+    # net1.eval()
     net2.eval()
     net3.eval()
     net4.eval()
@@ -100,9 +100,9 @@ def test():
                     # if len(coord_image) > 10:
                     #     pred = torch.zeros_like(pred)
                     img = F.interpolate(input=img, scale_factor=(1024,((1024*size[1]//size[0])//2)*2), mode='bilinear', )
-                    pred1 = net1.forward(img)
-                    pred1 = F.interpolate(input=pred1, scale_factor=(size[0],size[1]),
-                                        mode='bilinear', )
+                    # pred1 = net1.forward(img)
+                    # pred1 = F.interpolate(input=pred1, scale_factor=(size[0],size[1]),
+                    #                     mode='bilinear', )
                     pred2 = net2.forward(img)
                     pred2 = F.interpolate(input=pred2, scale_factor=(size[0], size[1]),
                                           mode='bilinear', )
@@ -113,21 +113,21 @@ def test():
                     pred4 = F.interpolate(input=pred4[0], scale_factor=(size[0], size[1]),
                                           mode='bilinear', )
                 else:
-                    pred1 = net1.forward(img)
+                    # pred1 = net1.forward(img)
                     pred2 = net2.forward(img)
                     pred3 = net3.forward(img)
                     pred4 = net4.forward(img)
             else:
-                pred1 = net1.forward(img)
+                # pred1 = net1.forward(img)
                 pred2 = net2.forward(img)
                 pred3 = net3.forward(img)
                 pred4 = net4.forward(img)
 
 
-            if isinstance(pred1, list):
-                pred1 = pred1[0]
-            elif isinstance(pred1, tuple):
-                pred1 = pred1[0]
+            # if isinstance(pred1, list):
+            #     pred1 = pred1[0]
+            # elif isinstance(pred1, tuple):
+            #     pred1 = pred1[0]
             if isinstance(pred2, list):
                 pred2 = pred2[0]
             elif isinstance(pred2, tuple):
@@ -149,11 +149,12 @@ def test():
             # # pred = pred[:, :, :size[0], :size[1]]
             # pred = pred[:, :, :ori_size[0], :ori_size[1]]
 
-            pred1 = (pred1[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()
+            # pred1 = (pred1[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()
             pred2 = (pred2[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()
             pred3 = (pred3[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()
             pred4 = (pred4[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()
-            pred = ((pred1 + pred2 + pred3 + pred4) > 1).float()
+            # pred = ((pred1 + pred2 + pred3 + pred4) > 1).float()
+            pred = ((pred2 + pred3 + pred4) > 1).float()
 
 
             ### save img LKUNet
