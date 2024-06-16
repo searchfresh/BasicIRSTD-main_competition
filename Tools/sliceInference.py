@@ -1,31 +1,20 @@
 import torch
 import torchvision.transforms as T
-from torchvision.models.segmentation import fcn_resnet50
+# from torchvision.models.segmentation import fcn_resnet50
 from PIL import Image
 import numpy as np
 import torch.nn.functional as F
 from Tools.unfoldGetPatch import sliding_window_tensor
-from VisualV1 import visual
+# from VisualV1 import visual
 # outLayerFeature = {}  # 创建全局变量，存储需要可视化层级的featuremap
+from torchvision import transforms
 
-
-# def load_model():
-#     model = fcn_resnet50(pretrained=True)
-#     model.eval()
-#     return model
-#
-# def preprocess_image(img_path, base_size=256):
-#     img = Image.open(img_path)
-#     transform = T.Compose([
-#         T.Resize((base_size, base_size)),
-#         T.ToTensor(),
-#         T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-#     ])
-#     return transform(img)
+resize1 = transforms.Resize((384, 384), interpolation=transforms.InterpolationMode.BILINEAR)
+resize2 = transforms.Resize((256, 256), interpolation=transforms.InterpolationMode.BILINEAR)
 
 def infer_patch(model, patch):
     with torch.no_grad():
-        pred = model.forward(patch.unsqueeze(0).unsqueeze(0))
+        pred = model.forward(patch)
 
         if isinstance(pred, list):
             pred = pred[0]
@@ -33,7 +22,7 @@ def infer_patch(model, patch):
             pred = pred[0]
     return pred
 
-def pad_image(img, patch_size):
+def pad_image(img, patch_size):  #已弃用，使用unfold代替
     # 检查图像，如果不够至少一个Patch的大小则对短边进行填充
     B, C, H, W = img.shape
     pad_h = max(0, patch_size - H)
@@ -59,7 +48,6 @@ def image_to_patches(img, patch_size, overlap):   #已弃用，使用unfold代�
             if patch.shape[-1] == patch_size and patch.shape[-2] == patch_size:
                 patches.append(patch)
                 coords.append((i, j))
-
     return patches, coords
 
 
@@ -76,8 +64,8 @@ def patches_to_image(patches, coords, base_size, patch_size: int = 256):
     z = 0
     for i in range(0, base_size[0]-patch_size + 1, coords[0]):  # coords[0] = stride_y
         for j in range(0, base_size[1]-patch_size + 1, coords[1]): # coords[1] = stride_x
-            full_output[:, :, i:i + patch_size, j:j + patch_size] = torch.maximum(
-                 full_output[:, :, i:i + patch_size, j:j + patch_size], patches[z][0, 0, :, :])
+            full_output[0, :, i:i + patch_size, j:j + patch_size] = torch.maximum(
+                 full_output[0, :, i:i + patch_size, j:j + patch_size], patches[z, :, :, :])
             z = z+1
 
     # for patch, (i, j) in zip(patches, coords):
@@ -96,14 +84,18 @@ def patches_to_image(patches, coords, base_size, patch_size: int = 256):
 #     return full_output
 
 
-def slice_inference(img, img_name, base_size:tuple, patch_size: int, model):
+def slice_inference(img, base_size:tuple, patch_size: int, model):
     # 把图按patch划分
-    patches, coords = sliding_window_tensor(img, patch_size)
+    patches, coords = sliding_window_tensor(img, patch_size) #b,1,h,w
     # patches, coords = image_to_patches(img=img, patch_size=patch_size, overlap=overlap)
+
+    # patches = resize1(patches)
+
     # 推理各个patch
-    patched_outputs = [infer_patch(model, patch) for patch in patches]  # patches是list[] 列表形式 存储每个patch推理后的结果
+    patched_outputs = infer_patch(model, patches)  # patches是list[] 列表形式 存储每个patch推理后的结果
 
     # concatenated_tensor = torch.cat(patched_outputs, dim=1)   # 需要把list列表中的各个patch 按照通道数进行concat后送入到visual函数
+    # patched_outputs = resize2(concatenated_tensor)
     # outLayerFeature[f"{img_name}_Patch"] = concatenated_tensor
     # visual(None, outLayerFeature)
 
