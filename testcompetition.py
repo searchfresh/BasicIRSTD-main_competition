@@ -107,13 +107,15 @@ def test():
                     pred2 = net2.forward(img)
                     pred2 = F.interpolate(input=pred2, size=(size[0], size[1]),
                                           mode='bilinear', )
-                    pred3 = net3.forward(img)
-                    pred3 = F.interpolate(input=pred3[0], size=(size[0], size[1]),
-                                          mode='bilinear', )
-
-                    pred4 = slice_inference(img, (1024,((1024*size[1]//size[0])//2)*2), 256, net4)
-                    pred4 = F.interpolate(input=pred4, size=(size[0], size[1]),
-                                          mode='bilinear', )
+                    # pred3 = net3.forward(img)
+                    # pred3 = F.interpolate(input=pred3[0], size=(size[0], size[1]),
+                    #                       mode='bilinear', )
+                    #
+                    # pred4 = slice_inference(img, (1024,((1024*size[1]//size[0])//2)*2), 256, net4)
+                    # pred4 = F.interpolate(input=pred4, size=(size[0], size[1]),
+                    #                       mode='bilinear', )
+                    pred3 = torch.zeros_like(img)
+                    pred4 = torch.zeros_like(img)
                 else:
                     pred1 = net1.forward(img)
                     pred2 = net2.forward(img)
