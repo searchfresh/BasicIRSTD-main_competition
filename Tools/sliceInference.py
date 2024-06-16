@@ -14,12 +14,19 @@ resize2 = transforms.Resize((256, 256), interpolation=transforms.InterpolationMo
 
 def infer_patch(model, patch):
     with torch.no_grad():
-        pred = model.forward(patch)
+        b,_,_,_ = patch.shape
+        pred1 = model.forward(patch[0 : b//2])
+        if isinstance(pred1, list):
+            pred1 = pred1[0]
+        elif isinstance(pred1, tuple):
+            pred1 = pred1[0]
+        pred2 = model.forward(patch[b // 2:])
+        if isinstance(pred2, list):
+            pred2 = pred2[0]
+        elif isinstance(pred2, tuple):
+            pred2 = pred2[0]
+        pred = torch.cat([pred1,pred2],dim=0)
 
-        if isinstance(pred, list):
-            pred = pred[0]
-        elif isinstance(pred, tuple):
-            pred = pred[0]
     return pred
 
 def pad_image(img, patch_size):  #已弃用，使用unfold代替
