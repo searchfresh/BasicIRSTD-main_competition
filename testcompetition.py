@@ -64,7 +64,7 @@ def test():
     net1 = Net(model_name=opt.model_names_1, mode='test').cuda()
     net2 = Net(model_name=opt.model_names_2, mode='test').cuda()
     net3 = Net(model_name=opt.model_names_3, mode='test').cuda()
-    # net4 = Net(model_name=opt.model_names_4, mode='test').cuda()
+    net4 = Net(model_name=opt.model_names_4, mode='test').cuda()
     if opt.SWA == True:
         net1 = AveragedModel(net1)
         net2 = AveragedModel(net2)
@@ -74,17 +74,17 @@ def test():
         net1.load_state_dict(torch.load(opt.pth_dirs_1)['state_dict'], strict=True)
         net2.load_state_dict(torch.load(opt.pth_dirs_2)['state_dict'], strict=True)
         net3.load_state_dict(torch.load(opt.pth_dirs_3)['state_dict'], strict=True)
-        # net4.load_state_dict(torch.load(opt.pth_dirs_4)['state_dict'], strict=True)
+        net4.load_state_dict(torch.load(opt.pth_dirs_4)['state_dict'], strict=True)
     except:
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         net1.load_state_dict(torch.load(opt.pth_dirs_1, map_location=device)['state_dict'])
         net2.load_state_dict(torch.load(opt.pth_dirs_2, map_location=device)['state_dict'])
         net3.load_state_dict(torch.load(opt.pth_dirs_3, map_location=device)['state_dict'])
-        # net4.load_state_dict(torch.load(opt.pth_dirs_4, map_location=device)['state_dict'])
+        net4.load_state_dict(torch.load(opt.pth_dirs_4, map_location=device)['state_dict'])
     net1.eval()
     net2.eval()
     net3.eval()
-    # net4.eval()
+    net4.eval()
 
     with torch.no_grad():
         for idx_iter, (img, size, img_dir, ori_size) in enumerate(test_loader):
@@ -111,19 +111,19 @@ def test():
                     pred3 = F.interpolate(input=pred3[0], size=(size[0], size[1]),
                                           mode='bilinear', )
 
-                    # pred4 = slice_inference(img, size, 256, net4)
-                    # pred4 = F.interpolate(input=pred4, size=(size[0], size[1]),
-                    #                       mode='bilinear', )
+                    pred4 = slice_inference(img, (1024,((1024*size[1]//size[0])//2)*2), 256, net4)
+                    pred4 = F.interpolate(input=pred4, size=(size[0], size[1]),
+                                          mode='bilinear', )
                 else:
                     pred1 = net1.forward(img)
                     pred2 = net2.forward(img)
                     pred3 = net3.forward(img)
-                    # pred4 = slice_inference(img, size, 256, net4)
+                    pred4 = slice_inference(img, size, 256, net4)
             else:
                 pred1 = net1.forward(img)
                 pred2 = net2.forward(img)
                 pred3 = net3.forward(img)
-                # pred4 = slice_inference(img, size, 256, net4)
+                pred4 = slice_inference(img, size, 256, net4)
 
 
             if isinstance(pred1, list):
@@ -138,10 +138,12 @@ def test():
                 pred3 = pred3[0]
             elif isinstance(pred3, tuple):
                 pred3 = pred3[0]
-            # if isinstance(pred4, list):
-            #     pred4 = pred4[0]
-            # elif isinstance(pred4, tuple):
-            #     pred4 = pred4[0]
+            if isinstance(pred4, list):
+                pred4 = pred4[0]
+            elif isinstance(pred4, tuple):
+                pred4 = pred4[0]
+
+
             # if size[0] >= 4096 or size[1] >= 4096:
             #     pred = F.interpolate(input=pred, size=(size[0], size[1]), mode='bilinear',)
 
@@ -154,8 +156,8 @@ def test():
             pred1 = (pred1[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()
             pred2 = (pred2[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()
             pred3 = (pred3[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()
-            # pred4 = (pred4[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()
-            pred = ((pred1 + pred2 + 2*pred3) > 1).float()
+            pred4 = (pred4[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()
+            pred = ((pred1 + pred2 + pred3 + pred4) > 1).float()
 
 
             ### save img LKUNet
