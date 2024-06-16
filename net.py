@@ -85,6 +85,8 @@ class Net(nn.Module):
             self.model = LKUNet3()
             # only finetune
             # self.cal_loss = LKULoss()
+        elif model_name == "HrisNet":
+            self.model = HrisNet()
 
     def forward(self, img):
         return self.model(img)
