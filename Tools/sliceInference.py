@@ -27,7 +27,7 @@ def infer_patch(model, patch):
             elif isinstance(pred2, tuple):
                 pred2 = pred2[0]
             pred = torch.cat([pred1, pred2], dim=0)
-        elif b > 16 and b <= 36:
+        elif b > 16 and b <= 32:
             pred1 = model.forward(patch[0: b // 4, :, :, :])
             if isinstance(pred1, list):
                 pred1 = pred1[0]
@@ -49,43 +49,43 @@ def infer_patch(model, patch):
             elif isinstance(pred4, tuple):
                 pred4 = pred4[0]
             pred = torch.cat([pred1, pred2, pred3, pred4], dim=0)
-        elif b > 36:
-            pred1 = model.forward(patch[0: b // 4, :, :, :])
+        elif b > 32:
+            pred1 = model.forward(patch[0: b // 8, :, :, :])
             if isinstance(pred1, list):
                 pred1 = pred1[0]
             elif isinstance(pred1, tuple):
                 pred1 = pred1[0]
-            pred2 = model.forward(patch[b // 4:b // 2, :, :, :])
+            pred2 = model.forward(patch[b // 8:b // 4, :, :, :])
             if isinstance(pred2, list):
                 pred2 = pred2[0]
             elif isinstance(pred2, tuple):
                 pred2 = pred2[0]
-            pred3 = model.forward(patch[b // 2:(b // 4) * 3, :, :, :])
+            pred3 = model.forward(patch[b // 4:(b // 8) * 3, :, :, :])
             if isinstance(pred3, list):
                 pred3 = pred3[0]
             elif isinstance(pred3, tuple):
                 pred3 = pred3[0]
-            pred4 = model.forward(patch[(b // 4) * 3:, :, :, :])
+            pred4 = model.forward(patch[(b // 8) * 3:b//2, :, :, :])
             if isinstance(pred4, list):
                 pred4 = pred4[0]
             elif isinstance(pred4, tuple):
                 pred4 = pred4[0]
-            pred5 = model.forward(patch[(b // 4) * 3:, :, :, :])
+            pred5 = model.forward(patch[b // 2:(b // 8) * 5, :, :, :])
             if isinstance(pred5, list):
                 pred5 = pred5[0]
             elif isinstance(pred5, tuple):
                 pred5 = pred5[0]
-            pred6 = model.forward(patch[(b // 4) * 3:, :, :, :])
+            pred6 = model.forward(patch[(b // 8) * 5:(b // 8) * 6, :, :, :])
             if isinstance(pred6, list):
                 pred6 = pred6[0]
             elif isinstance(pred6, tuple):
                 pred6 = pred6[0]
-            pred7 = model.forward(patch[(b // 4) * 3:, :, :, :])
+            pred7 = model.forward(patch[(b // 8) * 6:(b // 8) * 7, :, :, :])
             if isinstance(pred7, list):
                 pred7 = pred7[0]
             elif isinstance(pred7, tuple):
                 pred7 = pred7[0]
-            pred8 = model.forward(patch[(b // 4) * 3:, :, :, :])
+            pred8 = model.forward(patch[(b // 8) * 7:, :, :, :])
             if isinstance(pred8, list):
                 pred8 = pred8[0]
             elif isinstance(pred8, tuple):
