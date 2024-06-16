@@ -12,7 +12,8 @@ intervals_256 = [(256, 512, 0), (512, 640, 1), (640, 768, 2), (768, 896, 3), (89
         (1664, 1792, 11), (1792, 1920, 12),(1920, 2049, 13),(2049,2176,14),(2176,2304,15),(2816,2944,16)]
 intervals_384 = [(384, 768, 0), (768, 1152, 1), (1152, 1536, 2), (1536, 1920, 3), (1920, 2304, 4), (2304, 2688, 5),
          (2688, 3072, 6)]
-
+intervals_512 = [(512, 1024, 0), (1024, 1024+256, 1), (1024+256, 1536, 2), (1536, 1536+256, 3), (1536+256, 2048, 4), (2048, 2048+256, 5),
+         (2048+256, 2048+512, 6)]
 
 def get_y_value(z, intervals, Y):
     """
@@ -64,8 +65,8 @@ def sliding_window_tensor(input_tensor, kernel_size, save_path=None, img_name=No
         image_height = input_tensor.shape[2]
         image_width = input_tensor.shape[3]
 
-    x = get_y_value(image_width, intervals_256, Y)
-    y = get_y_value(image_height, intervals_256, Y)
+    x = get_y_value(image_width, intervals_512, Y)
+    y = get_y_value(image_height, intervals_512, Y)
 
     if image_height == kernel_size:
         stride_y = kernel_size
