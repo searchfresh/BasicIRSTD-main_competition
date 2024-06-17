@@ -55,7 +55,7 @@ class TestSetLoader(Dataset):
 
         ori_h , ori_w = img.shape
 
-        img = PadImg(img, 256)
+        img = PadImg(img, 1024)
         # mask = PadImg(mask, 32)
 
         # transform TTA
