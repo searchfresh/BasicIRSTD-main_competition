@@ -4,10 +4,7 @@ from torch.utils.data import DataLoader
 from net import Net
 from dataset3 import *
 import os
-import torch.nn.functional as F
-import torch
 from torch.optim.swa_utils import AveragedModel
-from metrics import *
 from Tools.sliceInference import *
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 parser = argparse.ArgumentParser(description="PyTorch BasicIRSTD test")
@@ -50,11 +47,6 @@ parser.add_argument("--filter_large", type=bool, default=True, help="Sliced for 
 
 global opt
 opt = parser.parse_args()
-## Set img_norm_cfg
-if opt.img_norm_cfg_mean != None and opt.img_norm_cfg_std != None:
-    opt.img_norm_cfg = dict()
-    opt.img_norm_cfg['mean'] = opt.img_norm_cfg_mean
-    opt.img_norm_cfg['std'] = opt.img_norm_cfg_std
 
 
 def test():
@@ -101,15 +93,15 @@ def test():
                     # if len(coord_image) > 10:
                     #     pred = torch.zeros_like(pred)
                     if size[0] > size[1]:
-                        size_t = (1024, int(((1024 * size[1] // size[0]) // 2) * 2))
+                        size_t = (1024, (int(1024 * torch.div(size[1], size[0], rounding_mode='floor')) // 2) * 2)
                     else:
-                        size_t = ((int((1024 * size[0] // size[1]) // 2) * 2), 1024)
+                        size_t = ((int(1024 * torch.div(size[0], size[1], rounding_mode='floor')) // 2) * 2, 1024)
 
                     img = F.interpolate(input=img, size=size_t, mode='bilinear', )
 
-                    # pred1 = net1.forward(img)
-                    # pred1 = F.interpolate(input=pred1, size=(size[0],size[1]),
-                    #                     mode='bilinear', )
+                    pred1 = net1.forward(img)
+                    pred1 = F.interpolate(input=pred1, size=(size[0],size[1]),
+                                        mode='bilinear', )
                     pred2 = net2.forward(img)
                     pred2 = F.interpolate(input=pred2, size=(size[0], size[1]),
                                           mode='bilinear', )
@@ -117,15 +109,15 @@ def test():
                     pred3 = F.interpolate(input=pred3[0], size=(size[0], size[1]),
                                           mode='bilinear', )
 
-                    # pred4 = slice_inference(img, size_t, 512, net4)
-                    # pred4 = F.interpolate(input=pred4, size=(size[0], size[1]),
-                    #                       mode='bilinear', )
+                    pred4 = slice_inference(img, size_t, 512, net4)
+                    pred4 = F.interpolate(input=pred4, size=(size[0], size[1]),
+                                          mode='bilinear', )
                     # pred3 = torch.zeros_like(img)
-                    pred4 = torch.zeros_like(pred3)
-                    pred1 = torch.zeros_like(pred4)
+                    # pred4 = torch.zeros_like(pred3)
+                    # pred1 = torch.zeros_like(pred4)
                 else:
-                    # pred1 = net1.forward(img)
-                    pred1 = torch.zeros_like(img)
+                    pred1 = net1.forward(img)
+                    # pred1 = torch.zeros_like(img)
                     pred2 = net2.forward(img)
                     pred3 = net3.forward(img)
                     pred4 = slice_inference(img, size, 512, net4)

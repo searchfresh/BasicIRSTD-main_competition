@@ -21,6 +21,7 @@ class TestSetLoader(Dataset):
         super(TestSetLoader).__init__()
         self.dataset_dir = dataset_dir + '/' + test_dataset_name
         with open(self.dataset_dir + '/img_idx/test_' + test_dataset_name + '.txt', 'r') as f:
+        # with open(self.dataset_dir + '/img_idx/test.txt', 'r') as f:
         # with open(self.dataset_dir + '/img_idx/test' + '.txt', 'r') as f:
         # with open(r"D:\PycharmFile\BasicIRSTD-main\datasets\Dataset-mask\img_idx\test_Dtatset-mask.txt", 'r') as f:
             self.test_list = f.read().splitlines()
@@ -55,7 +56,7 @@ class TestSetLoader(Dataset):
 
         ori_h , ori_w = img.shape
 
-        img = PadImg(img, 1024)
+        img = PadImg(img, 256)
         # mask = PadImg(mask, 32)
 
         # transform TTA
