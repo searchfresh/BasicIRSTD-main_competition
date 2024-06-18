@@ -65,8 +65,12 @@ def sliding_window_tensor(input_tensor, kernel_size, save_path=None, img_name=No
         image_height = input_tensor.shape[2]
         image_width = input_tensor.shape[3]
 
-    x = get_y_value(image_width, intervals_512, Y)
-    y = get_y_value(image_height, intervals_512, Y)
+    if kernel_size == 512:
+        x = get_y_value(image_width, intervals_512, Y)
+        y = get_y_value(image_height, intervals_512, Y)
+    elif kernel_size == 256:
+        x = get_y_value(image_width, intervals_256, Y)
+        y = get_y_value(image_height, intervals_256, Y)
 
     if image_height == kernel_size:
         stride_y = kernel_size
