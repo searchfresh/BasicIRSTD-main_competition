@@ -87,7 +87,7 @@ def test():
             # elif size[0]>=2048 or size[1]>=2048:
             #     img = F.interpolate(input=img, scale_factor=0.25, mode='bilinear',)
             if opt.filter_large:
-                if ori_size[-1] > 1536 or ori_size[-2] > 1536:
+                if size[-1] > 4096 or size[-2] > 4096:
                     # predits = np.array((pred[0, 0, :, :] > opt.threshold).cpu()).astype('int64')
                     # image_predict = measure.label(predits, connectivity=2)
                     # coord_image = measure.regionprops(image_predict)
@@ -98,23 +98,23 @@ def test():
                     # else:
                     #     size_t = ((int(1024 * torch.div(size[0], size[1], rounding_mode='floor')) // 2) * 2, 1024)
                     #
-                    size_t = (2048,2048)
+                    # size_t = (2048,2048)
+                    # img = F.interpolate(input=img, size=size_t, mode='bilinear', )
+                    size_t = (4096, 4096)
                     img = F.interpolate(input=img, size=size_t, mode='bilinear', )
-
                     pred1 = net1.forward(img)
                     pred1 = F.interpolate(input=pred1, size=(size[0],size[1]),
                                         mode='bilinear', )
                     pred2 = net2.forward(img)
                     pred2 = F.interpolate(input=pred2, size=(size[0], size[1]),
-                                          mode='bilinear', )
+                                            mode='bilinear', )
                     pred3 = net3.forward(img)
                     pred3 = F.interpolate(input=pred3[0], size=(size[0], size[1]),
-                                          mode='bilinear', )
+                                            mode='bilinear', )
 
                     pred4 = slice_inference(img, size_t, 512, net4)
                     pred4 = F.interpolate(input=pred4, size=(size[0], size[1]),
                                           mode='bilinear', )
-
                 else:
                     pred1 = net1.forward(img)
                     pred2 = net2.forward(img)
@@ -155,12 +155,12 @@ def test():
             # pred = pred[:, :, :ori_size[0], :ori_size[1]]
 
 
-            if ori_size[-1] > 1536 or ori_size[-2] > 1536:
-                pred1 = (pred1[:, :, :ori_size[0], :ori_size[1]] > 0.95).float()
-                pred2 = (pred2[:, :, :ori_size[0], :ori_size[1]] > 0.95).float()
-                pred3 = (pred3[:, :, :ori_size[0], :ori_size[1]] > 0.95).float()
-                pred4 = (pred4[:, :, :ori_size[0], :ori_size[1]] > 0.95).float()
-                pred = ((pred1 + pred2 + pred3 + pred4) > 2).float()
+            if ori_size[-1] >= 1024 or ori_size[-2] >= 1024:
+                pred1 = (pred1[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()
+                pred2 = (pred2[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()
+                pred3 = (pred3[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()
+                pred4 = (pred4[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()
+                pred = ((pred1 + pred2 + pred3 + pred4) > 1).float()
                 pred = filter_large(pred.cpu())
             else:
                 pred1 = (pred1[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()

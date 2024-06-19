@@ -10,7 +10,7 @@ def filter_large(image):
     contours = contours[0] if len(contours) == 2 else contours[1]
     # 创建一个和输入图像大小相同的空白图像
     output_image = np.zeros_like(binary_image)
-    if len(contours)<10:
+    if len(contours)<15:
         output_image = image
     else:
         for contour in contours:
