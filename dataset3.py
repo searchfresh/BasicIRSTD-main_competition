@@ -59,7 +59,7 @@ class TestSetLoader(Dataset):
         if ori_h<1024 or ori_w<1024:
             img = PadImg(img, 256)
         else:
-            img = PadImg(img, 1024)
+            img = PadImg(img, 512)
         # mask = PadImg(mask, 32)
 
         # transform TTA

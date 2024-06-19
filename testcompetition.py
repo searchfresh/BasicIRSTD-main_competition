@@ -87,7 +87,7 @@ def test():
             # elif size[0]>=2048 or size[1]>=2048:
             #     img = F.interpolate(input=img, scale_factor=0.25, mode='bilinear',)
             if opt.filter_large:
-                if size[-1] > 4096 or size[-2] > 4096:
+                if size[-1] >= 3072 or size[-2] >= 3072:
                     # predits = np.array((pred[0, 0, :, :] > opt.threshold).cpu()).astype('int64')
                     # image_predict = measure.label(predits, connectivity=2)
                     # coord_image = measure.regionprops(image_predict)
@@ -100,21 +100,21 @@ def test():
                     #
                     # size_t = (2048,2048)
                     # img = F.interpolate(input=img, size=size_t, mode='bilinear', )
-                    size_t = (4096, 4096)
-                    img = F.interpolate(input=img, size=size_t, mode='bilinear', )
-                    pred1 = net1.forward(img)
-                    pred1 = F.interpolate(input=pred1, size=(size[0],size[1]),
-                                        mode='bilinear', )
-                    pred2 = net2.forward(img)
-                    pred2 = F.interpolate(input=pred2, size=(size[0], size[1]),
-                                            mode='bilinear', )
-                    pred3 = net3.forward(img)
-                    pred3 = F.interpolate(input=pred3[0], size=(size[0], size[1]),
-                                            mode='bilinear', )
-
-                    pred4 = slice_inference(img, size_t, 512, net4)
-                    pred4 = F.interpolate(input=pred4, size=(size[0], size[1]),
-                                          mode='bilinear', )
+                    pred1 = torch.zeros(img.shape).cuda()
+                    pred2 = torch.zeros(img.shape).cuda()
+                    pred3 = torch.zeros(img.shape).cuda()
+                    pred4 = torch.zeros(img.shape).cuda()
+                    for i in range(0, size[0], 512):
+                        for j in range(0, size[1], 512):
+                            sub_img = img[:, :, i:i + 512, j:j + 512]
+                            sub_pred1 = net1.forward(sub_img)
+                            pred1[:, :, i:i + 512, j:j + 512] = sub_pred1
+                            sub_pred2 = net2.forward(sub_img)
+                            pred2[:, :, i:i + 512, j:j + 512] = sub_pred2
+                            sub_pred3 = net3.forward(sub_img)
+                            pred3[:, :, i:i + 512, j:j + 512] = sub_pred3[0]
+                            sub_pred4 = net4.forward(sub_img)
+                            pred4[:,:,i:i+512,j:j+512]=sub_pred4[0]
                 else:
                     pred1 = net1.forward(img)
                     pred2 = net2.forward(img)

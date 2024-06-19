@@ -65,7 +65,6 @@ class Net(nn.Module):
                 self.model = RepirDet(deploy=False, mode='train')
             else:
                 self.model = RepirDet(deploy=False, mode='test')
-            self.cal_loss = RepirLoss()
         elif model_name == 'RepISD':
             if mode == 'train':
                 self.model = RepISD()
