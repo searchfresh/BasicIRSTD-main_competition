@@ -6,6 +6,7 @@ from dataset3 import *
 import os
 from torch.optim.swa_utils import AveragedModel
 from Tools.sliceInference import *
+from filter_process import filter_large
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
 parser = argparse.ArgumentParser(description="PyTorch BasicIRSTD test")
 parser.add_argument("--model_names_1", default='LKUNet',
@@ -15,7 +16,7 @@ parser.add_argument("--model_names_2", default='LKUNet2',
 parser.add_argument("--model_names_3", default='LKUNet3',
                     help="model_name: 'ACM', 'ALCNet', 'DNANet', 'ISNet', 'UIUNet', 'RDIAN', 'ISTDU-Net', 'U-Net', 'RISTDnet'")
 
-parser.add_argument("--pth_dirs_1", default=r"./checkpoint/Dataset-mask/LKUNet_all.pth",
+parser.add_argument("--pth_dirs_1", default=r"./checkpoint/Dataset-mask/LKUNet13.pth",
                     help="checkpoint dir" )
 parser.add_argument("--pth_dirs_2", default=r"./checkpoint/Dataset-mask/LKUNet_best17.pth",
                     help="checkpoint dir" )
@@ -58,7 +59,7 @@ def test():
     net3 = Net(model_name=opt.model_names_3, mode='test').cuda()
     net4 = Net(model_name=opt.model_names_4, mode='test').cuda()
     if opt.SWA == True:
-        # net1 = AveragedModel(net1)
+        net1 = AveragedModel(net1)
         net2 = AveragedModel(net2)
         # net3 = AveragedModel(net3)
 
@@ -153,13 +154,19 @@ def test():
             # # pred = pred[:, :, :size[0], :size[1]]
             # pred = pred[:, :, :ori_size[0], :ori_size[1]]
 
-            pred1 = (pred1[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()
-            pred2 = (pred2[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()
-            pred3 = (pred3[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()
-            pred4 = (pred4[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()
+
             if ori_size[-1] > 1536 or ori_size[-2] > 1536:
+                pred1 = (pred1[:, :, :ori_size[0], :ori_size[1]] > 0.95).float()
+                pred2 = (pred2[:, :, :ori_size[0], :ori_size[1]] > 0.95).float()
+                pred3 = (pred3[:, :, :ori_size[0], :ori_size[1]] > 0.95).float()
+                pred4 = (pred4[:, :, :ori_size[0], :ori_size[1]] > 0.95).float()
                 pred = ((pred1 + pred2 + pred3 + pred4) > 2).float()
+                pred = filter_large(pred.cpu())
             else:
+                pred1 = (pred1[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()
+                pred2 = (pred2[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()
+                pred3 = (pred3[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()
+                pred4 = (pred4[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()
                 pred = ((pred1 + pred2 + pred3 + pred4) > 1).float()
 
 
