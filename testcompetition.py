@@ -1,4 +1,6 @@
 import argparse
+
+import torch
 from torch.autograd import Variable
 from torch.utils.data import DataLoader
 from net import Net
@@ -99,31 +101,35 @@ def test():
                     # else:
                     #     size_t = ((int(1024 * torch.div(size[0], size[1], rounding_mode='floor')) // 2) * 2, 1024)
                     #
-                    size_t = (2048,2048)
-                    img = F.interpolate(input=img, size=size_t, mode='bilinear', )
-
-                    pred1 = net1.forward(img)
-                    pred1 = F.interpolate(input=pred1, size=(size[0],size[1]),
-                                        mode='bilinear', )
-
-                    pred2 = net2.forward(img)
-                    if isinstance(pred2, list):
-                        pred2 = pred2[0]
-                    elif isinstance(pred2, tuple):
-                        pred2 = pred2[0]
-                    pred2 = F.interpolate(input=pred2, size=(size[0], size[1]),
-                                          mode='bilinear', )
-                    pred3 = net3.forward(img)
-                    if isinstance(pred3, list):
-                        pred3 = pred3[0]
-                    elif isinstance(pred3, tuple):
-                        pred3 = pred3[0]
-                    pred3 = F.interpolate(input=pred3, size=(size[0], size[1]),
-                                          mode='bilinear', )
-
-                    pred4 = slice_inference(img, size_t, 512, net4)
-                    pred4 = F.interpolate(input=pred4, size=(size[0], size[1]),
-                                          mode='bilinear', )
+                    # size_t = (2048,2048)
+                    # img = F.interpolate(input=img, size=size_t, mode='bilinear', )
+                    #
+                    # pred1 = net1.forward(img)
+                    # pred1 = F.interpolate(input=pred1, size=(size[0],size[1]),
+                    #                     mode='bilinear', )
+                    #
+                    # pred2 = net2.forward(img)
+                    # if isinstance(pred2, list):
+                    #     pred2 = pred2[0]
+                    # elif isinstance(pred2, tuple):
+                    #     pred2 = pred2[0]
+                    # pred2 = F.interpolate(input=pred2, size=(size[0], size[1]),
+                    #                       mode='bilinear', )
+                    # pred3 = net3.forward(img)
+                    # if isinstance(pred3, list):
+                    #     pred3 = pred3[0]
+                    # elif isinstance(pred3, tuple):
+                    #     pred3 = pred3[0]
+                    # pred3 = F.interpolate(input=pred3, size=(size[0], size[1]),
+                    #                       mode='bilinear', )
+                    #
+                    # pred4 = slice_inference(img, size_t, 512, net4)
+                    # pred4 = F.interpolate(input=pred4, size=(size[0], size[1]),
+                    #                       mode='bilinear', )
+                    pred1 = torch.zeros_like(img)
+                    pred2 = torch.zeros_like(img)
+                    pred3 = torch.zeros_like(img)
+                    pred4 = torch.zeros_like(img)
 
                 else:
                     pred1 = net1.forward(img)
@@ -171,13 +177,13 @@ def test():
                 pred3 = (pred3[:, :, :ori_size[0], :ori_size[1]] > 0.95).float()
                 pred4 = (pred4[:, :, :ori_size[0], :ori_size[1]] > 0.95).float()
                 pred = ((pred1 + pred2 + pred3 + pred4) > 2).float()
-                pred = filter_large(pred.cpu())
+                # pred = filter_large(pred.cpu())
             else:
                 pred1 = (pred1[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()
                 pred2 = (pred2[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()
                 pred3 = (pred3[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()
                 pred4 = (pred4[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()
-                pred = ((pred1 + pred2 + pred3 + pred4) > 1).float()
+                pred = ((0.9*pred1+1.1*pred2+0.9*pred3+1.1*pred4)>1).float()
 
 
             ### save img LKUNet
