@@ -43,7 +43,7 @@ parser.add_argument("--save_img", default=True, type=bool, help="save image of o
 parser.add_argument("--save_img_dir", type=str, default='./results/', help="path of saved image")
 parser.add_argument("--save_log", type=str, default='./log/', help="path of saved .pth")
 parser.add_argument("--threshold", type=float, default=0.05)
-parser.add_argument("--SWA", type=bool, default=True, help="Sliced for inference")
+parser.add_argument("--SWA", type=bool, default=False, help="Sliced for inference")
 parser.add_argument("--filter_large", type=bool, default=True, help="Sliced for inference")
 
 global opt
@@ -105,6 +105,7 @@ def test():
                     pred1 = net1.forward(img)
                     pred1 = F.interpolate(input=pred1, size=(size[0],size[1]),
                                         mode='bilinear', )
+
                     pred2 = net2.forward(img)
                     if isinstance(pred2, list):
                         pred2 = pred2[0]
