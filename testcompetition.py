@@ -25,7 +25,7 @@ parser.add_argument("--pth_dirs_3", default=r"checkpoint/Dataset-mask/LKUNet_9_s
 
 parser.add_argument("--model_names_4", default='HrisNet',
                     help="model_name: 'ACM', 'ALCNet', 'DNANet', 'ISNet', 'UIUNet', 'RDIAN', 'ISTDU-Net', 'U-Net', 'RISTDnet'")
-parser.add_argument("--pth_dirs_4", default=r"./checkpoint/Dataset-mask/HrisNet1",
+parser.add_argument("--pth_dirs_4", default=r"checkpoint/Dataset-mask/HrisNet1",
                     help="checkpoint dir" )
 
 parser.add_argument("--dataset_dir", default='./datasets', type=str, help="train_dataset_dir")
