@@ -16,16 +16,16 @@ parser.add_argument("--model_names_2", default='LKUNet2',
 parser.add_argument("--model_names_3", default='LKUNet3',
                     help="model_name: 'ACM', 'ALCNet', 'DNANet', 'ISNet', 'UIUNet', 'RDIAN', 'ISTDU-Net', 'U-Net', 'RISTDnet'")
 
-parser.add_argument("--pth_dirs_1", default=r"./checkpoint/Dataset-mask/LKUNet13.pth",
+parser.add_argument("--pth_dirs_1", default=r"checkpoint/Dataset-mask/LKUNet_all.pth",
                     help="checkpoint dir" )
-parser.add_argument("--pth_dirs_2", default=r"./checkpoint/Dataset-mask/LKUNet_best17.pth",
+parser.add_argument("--pth_dirs_2", default=r"checkpoint/Dataset-mask/LKUNet_172_684.pth",
                     help="checkpoint dir" )
-parser.add_argument("--pth_dirs_3", default=r"./checkpoint/Dataset-mask/LKUNet_69.pth",
+parser.add_argument("--pth_dirs_3", default=r"checkpoint/Dataset-mask/LKUNet_9_sd_717.pth",
                     help="checkpoint dir" )
 
 parser.add_argument("--model_names_4", default='HrisNet',
                     help="model_name: 'ACM', 'ALCNet', 'DNANet', 'ISNet', 'UIUNet', 'RDIAN', 'ISTDU-Net', 'U-Net', 'RISTDnet'")
-parser.add_argument("--pth_dirs_4", default=r"./checkpoint/Dataset-mask/HrisNet_400_57.pth",
+parser.add_argument("--pth_dirs_4", default=r"./checkpoint/Dataset-mask/HrisNet1",
                     help="checkpoint dir" )
 
 parser.add_argument("--dataset_dir", default='./datasets', type=str, help="train_dataset_dir")
@@ -55,13 +55,14 @@ def test():
     test_loader = DataLoader(dataset=test_set, num_workers=0, batch_size=1, shuffle=False)
 
     net1 = Net(model_name=opt.model_names_1, mode='test').cuda()
-    net2 = Net(model_name=opt.model_names_2, mode='test').cuda()
+    net2 = Net(model_name=opt.model_names_3, mode='test').cuda()
     net3 = Net(model_name=opt.model_names_3, mode='test').cuda()
     net4 = Net(model_name=opt.model_names_4, mode='test').cuda()
     if opt.SWA == True:
-        net1 = AveragedModel(net1)
-        net2 = AveragedModel(net2)
+        # net1 = AveragedModel(net1)
+        # net2 = AveragedModel(net2)
         # net3 = AveragedModel(net3)
+        pass
 
     try:
         net1.load_state_dict(torch.load(opt.pth_dirs_1)['state_dict'], strict=True)
@@ -87,7 +88,7 @@ def test():
             # elif size[0]>=2048 or size[1]>=2048:
             #     img = F.interpolate(input=img, scale_factor=0.25, mode='bilinear',)
             if opt.filter_large:
-                if size[-1] >= 3072 or size[-2] >= 3072:
+                if ori_size[-1] > 1536 or ori_size[-2] > 1536:
                     # predits = np.array((pred[0, 0, :, :] > opt.threshold).cpu()).astype('int64')
                     # image_predict = measure.label(predits, connectivity=2)
                     # coord_image = measure.regionprops(image_predict)
@@ -98,23 +99,31 @@ def test():
                     # else:
                     #     size_t = ((int(1024 * torch.div(size[0], size[1], rounding_mode='floor')) // 2) * 2, 1024)
                     #
-                    # size_t = (2048,2048)
-                    # img = F.interpolate(input=img, size=size_t, mode='bilinear', )
-                    pred1 = torch.zeros(img.shape).cuda()
-                    pred2 = torch.zeros(img.shape).cuda()
-                    pred3 = torch.zeros(img.shape).cuda()
-                    pred4 = torch.zeros(img.shape).cuda()
-                    for i in range(0, size[0], 512):
-                        for j in range(0, size[1], 512):
-                            sub_img = img[:, :, i:i + 512, j:j + 512]
-                            sub_pred1 = net1.forward(sub_img)
-                            pred1[:, :, i:i + 512, j:j + 512] = sub_pred1
-                            sub_pred2 = net2.forward(sub_img)
-                            pred2[:, :, i:i + 512, j:j + 512] = sub_pred2
-                            sub_pred3 = net3.forward(sub_img)
-                            pred3[:, :, i:i + 512, j:j + 512] = sub_pred3[0]
-                            sub_pred4 = net4.forward(sub_img)
-                            pred4[:,:,i:i+512,j:j+512]=sub_pred4[0]
+                    size_t = (2048,2048)
+                    img = F.interpolate(input=img, size=size_t, mode='bilinear', )
+
+                    pred1 = net1.forward(img)
+                    pred1 = F.interpolate(input=pred1, size=(size[0],size[1]),
+                                        mode='bilinear', )
+                    pred2 = net2.forward(img)
+                    if isinstance(pred2, list):
+                        pred2 = pred2[0]
+                    elif isinstance(pred2, tuple):
+                        pred2 = pred2[0]
+                    pred2 = F.interpolate(input=pred2, size=(size[0], size[1]),
+                                          mode='bilinear', )
+                    pred3 = net3.forward(img)
+                    if isinstance(pred3, list):
+                        pred3 = pred3[0]
+                    elif isinstance(pred3, tuple):
+                        pred3 = pred3[0]
+                    pred3 = F.interpolate(input=pred3, size=(size[0], size[1]),
+                                          mode='bilinear', )
+
+                    pred4 = slice_inference(img, size_t, 512, net4)
+                    pred4 = F.interpolate(input=pred4, size=(size[0], size[1]),
+                                          mode='bilinear', )
+
                 else:
                     pred1 = net1.forward(img)
                     pred2 = net2.forward(img)
@@ -155,12 +164,12 @@ def test():
             # pred = pred[:, :, :ori_size[0], :ori_size[1]]
 
 
-            if ori_size[-1] >= 1024 or ori_size[-2] >= 1024:
-                pred1 = (pred1[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()
-                pred2 = (pred2[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()
-                pred3 = (pred3[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()
-                pred4 = (pred4[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()
-                pred = ((pred1 + pred2 + pred3 + pred4) > 1).float()
+            if ori_size[-1] > 1536 or ori_size[-2] > 1536:
+                pred1 = (pred1[:, :, :ori_size[0], :ori_size[1]] > 0.95).float()
+                pred2 = (pred2[:, :, :ori_size[0], :ori_size[1]] > 0.95).float()
+                pred3 = (pred3[:, :, :ori_size[0], :ori_size[1]] > 0.95).float()
+                pred4 = (pred4[:, :, :ori_size[0], :ori_size[1]] > 0.95).float()
+                pred = ((pred1 + pred2 + pred3 + pred4) > 2).float()
                 pred = filter_large(pred.cpu())
             else:
                 pred1 = (pred1[:, :, :ori_size[0], :ori_size[1]] > opt.threshold).float()
